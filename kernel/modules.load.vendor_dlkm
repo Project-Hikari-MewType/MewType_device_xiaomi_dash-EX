@@ -233,7 +233,6 @@ xr-qs.ko
 dio_dma_mapper.ko
 miicmpfilter.ko
 mi_schedule.ko
-metis.ko
 powersave.ko
 lb.ko
 xm_power.ko

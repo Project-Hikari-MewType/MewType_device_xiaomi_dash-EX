@@ -92,8 +92,15 @@ TARGET_KERNEL_CONFIG_EXT := \
     kernel/xiaomi/dash/device-modules/kernel/configs/dash.config
 
 # The MTK device-module makefiles expect these during external module builds.
+# NOTE: Bliss vendor/bliss/build/tasks/kernel.mk does not forward
+# TARGET_KERNEL_KCONFIG_EXT_PREFIX, so pass KCONFIG_EXT_PREFIX explicitly.
+# Without it, kernel/Kconfig falls back to the empty placeholder
+# (kernel-6.6/Kconfig.ext), all CONFIG_MTK_* from device-modules are
+# dropped by olddefconfig, connadp.ko (CONFIG_MTK_COMBO) is never built,
+# and conninfra.ko fails modpost with undefined conn_pwr_*/wmt_* symbols.
 TARGET_KERNEL_ADDITIONAL_FLAGS := \
     KCFLAGS='-D__ANDROID_COMMON_KERNEL__ -Wno-error=enum-compare -Wno-error=sometimes-uninitialized' \
+    KCONFIG_EXT_PREFIX=../device-modules/ \
     DEVICE_MODULES_REL_DIR=../device-modules \
     DEVICE_MODULES_PATH=$(abspath $(TOP)/kernel/xiaomi/dash/device-modules) \
     DEVCIE_MODULES_INCLUDE=-I$(abspath $(TOP)/kernel/xiaomi/dash/device-modules)/include
@@ -153,7 +160,7 @@ BOARD_PVMFWIMAGE_PARTITION_SIZE := 20971520
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 
 ifeq ($(PRODUCT_SYSTEM_PARTITIONS_FILE_SYSTEM_TYPE),ext4)
--include vendor/lineage/config/BoardConfigReservedSize.mk
+-include vendor/bliss/config/BoardConfigReservedSize.mk
 endif
 
 BOARD_SUPER_PARTITION_SIZE := 9126805504
@@ -190,7 +197,7 @@ TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_USERIMAGES_USE_F2FS := true
 
 # SEPolicy
-include device/lineage/sepolicy/libion/sepolicy.mk
+include device/bliss/sepolicy/libion/sepolicy.mk
 include device/mediatek/sepolicy_vndr/SEPolicy.mk
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/private
